@@ -62,19 +62,26 @@ public static class LoggerUtils
         using var process = Process.GetCurrentProcess();
         var       path    = Path.GetDirectoryName(process.MainModule?.FileName);
         if (!string.IsNullOrEmpty(path))
-            foreach (var file in Directory.GetFiles(path, "LogWrapper.Sink.*.dll"))
-                AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(file));
-
-        // Setup serilog based on the wrapper configuration
-        var t = typeof(ISerilogConfigurator);
-        foreach (var configuratorType in AppDomain.CurrentDomain
-                                                  .GetAssemblies()
-                                                  .SelectMany(assembly => assembly.GetTypes())
-                                                  .Where(type => t.IsAssignableFrom(type) && type is {IsInterface: false, IsAbstract: false}))
         {
-            var configurator = (ISerilogConfigurator?) Activator.CreateInstance(configuratorType);
-            if (configurator is not null && wrapperConfig.Sinks.Value.HasFlag(configurator.Sink))
-                configurator.Configure(wrapperConfig, serilogConfig);
+            var t = typeof(ISerilogConfigurator);
+            foreach (var file in Directory.GetFiles(path, "LogWrapper.Sink.*.dll"))
+                try
+                {
+                    // Setup serilog based on the wrapper configuration
+                    foreach (var configuratorType in Assembly.LoadFile(file)
+                                                             .GetTypes()
+                                                             .Where(type => t.IsAssignableFrom(type) && type is {IsInterface: false, IsAbstract: false}))
+                    {
+                        var configurator = (ISerilogConfigurator?) Activator.CreateInstance(configuratorType);
+                        if (configurator is not null && wrapperConfig.Sinks.Value.HasFlag(configurator.Sink))
+                            configurator.Configure(wrapperConfig, serilogConfig);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    throw;
+                }
         }
 
         // Configure global minimum log level
