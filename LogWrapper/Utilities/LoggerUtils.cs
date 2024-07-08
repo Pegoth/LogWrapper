@@ -59,8 +59,9 @@ public static class LoggerUtils
             serilogConfig.ReadFrom.Configuration(configuration);
 
         // Force load LogWrapper assemblies, (they are not used directly, so they would never be loaded otherwise)
-        using var process = Process.GetCurrentProcess();
-        var       path    = Path.GetDirectoryName(process.MainModule?.FileName);
+        using var process    = Process.GetCurrentProcess();
+        var       path       = Path.GetDirectoryName(process.MainModule?.FileName);
+        var       exceptions = new List<(string file, Exception ex)>();
         if (!string.IsNullOrEmpty(path))
         {
             var t = typeof(ISerilogConfigurator);
@@ -79,8 +80,7 @@ public static class LoggerUtils
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
-                    throw;
+                    exceptions.Add((file, ex));
                 }
         }
 
@@ -89,6 +89,9 @@ public static class LoggerUtils
 
         // Set the base logger
         Log.Logger = serilogConfig.CreateLogger();
+
+        // Log any exceptions that occurred while loading the sinks
+        exceptions.ForEach(t => Log.Logger.Error(t.ex, "Error loading LogWrapper sink from: {file}.", t.file));
 
         return wrapperConfig;
     }
