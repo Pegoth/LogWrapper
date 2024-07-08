@@ -16,5 +16,5 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - uses: actions/checkout@v4
-      - run: dotnet build
-      - run: dotnet nuget push *.nupkg
+      - run: dotnet build -c Release
+      - run: dotnet nuget push "**/*.nupkg" --skip-duplicate
