@@ -59,30 +59,26 @@ public static class LoggerUtils
             serilogConfig.ReadFrom.Configuration(configuration);
 
         // Force load LogWrapper assemblies, (they are not used directly, so they would never be loaded otherwise)
-        using var process    = Process.GetCurrentProcess();
-        var       path       = Path.GetDirectoryName(process.MainModule?.FileName);
-        var       exceptions = new List<(string file, Exception ex)>();
-        if (!string.IsNullOrEmpty(path))
-        {
-            var t = typeof(ISerilogConfigurator);
-            foreach (var file in Directory.GetFiles(path, "LogWrapper.Sink.*.dll"))
-                try
+        using var process       = Process.GetCurrentProcess();
+        var       exceptions    = new List<(string file, Exception ex)>();
+        var       interfaceType = typeof(ISerilogConfigurator);
+        foreach (var file in Directory.GetFiles(AppContext.BaseDirectory, "LogWrapper.Sink.*.dll"))
+            try
+            {
+                // Setup serilog based on the wrapper configuration
+                foreach (var configuratorType in Assembly.LoadFile(file)
+                                                         .GetTypes()
+                                                         .Where(type => interfaceType.IsAssignableFrom(type) && type is {IsInterface: false, IsAbstract: false}))
                 {
-                    // Setup serilog based on the wrapper configuration
-                    foreach (var configuratorType in Assembly.LoadFile(file)
-                                                             .GetTypes()
-                                                             .Where(type => t.IsAssignableFrom(type) && type is {IsInterface: false, IsAbstract: false}))
-                    {
-                        var configurator = (ISerilogConfigurator?) Activator.CreateInstance(configuratorType);
-                        if (configurator is not null && wrapperConfig.Sinks.Value.HasFlag(configurator.Sink))
-                            configurator.Configure(wrapperConfig, serilogConfig);
-                    }
+                    var configurator = (ISerilogConfigurator?) Activator.CreateInstance(configuratorType);
+                    if (configurator is not null && wrapperConfig.Sinks.Value.HasFlag(configurator.Sink))
+                        configurator.Configure(wrapperConfig, serilogConfig);
                 }
-                catch (Exception ex)
-                {
-                    exceptions.Add((file, ex));
-                }
-        }
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add((file, ex));
+            }
 
         // Configure global minimum log level
         serilogConfig.MinimumLevel.Is(wrapperConfig.LogLevel.Value.ToSerilogLevel());
