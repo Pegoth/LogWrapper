@@ -5,9 +5,9 @@ using LogWrapper.Interfaces;
 using Serilog;
 using Serilog.Formatting.Json;
 
-namespace LogWrapper.File.Configurators;
+namespace LogWrapper.Sink.File.Configurators;
 
-internal class FileSerilogConfigurator : ISerilogConfigurator
+public class FileSerilogConfigurator : ISerilogConfigurator
 {
     public LogSinks Sink => LogSinks.File;
 

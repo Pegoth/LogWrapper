@@ -3,9 +3,9 @@ using LogWrapper.Enums;
 using LogWrapper.Interfaces;
 using Serilog;
 
-namespace LogWrapper.Console.Configurators;
+namespace LogWrapper.Sink.Console.Configurators;
 
-internal class DebugSerilogConfigurator : ISerilogConfigurator
+public class DebugSerilogConfigurator : ISerilogConfigurator
 {
     public LogSinks Sink => LogSinks.Console;
 
