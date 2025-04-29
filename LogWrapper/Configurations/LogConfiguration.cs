@@ -23,5 +23,5 @@ public class LogConfiguration
     /// <summary>
     ///     Directory that will hold the log files. Only used if <see cref="Sinks" /> has <see cref="LogSinks.File" />.
     /// </summary>
-    public string? LogFilesPath { get; set; }
+    public string? LogFilesPath { get; init; }
 }

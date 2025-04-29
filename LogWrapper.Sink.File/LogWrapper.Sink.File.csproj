@@ -4,7 +4,7 @@
         <OutputType>Library</OutputType>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>1.0.2</Version>
+        <Version>1.0.3</Version>
         <FileVersion>$(Version)</FileVersion>
         <AssemlbyVersion>$(Version)</AssemlbyVersion>
         <Authors>Pegoth</Authors>
@@ -15,7 +15,7 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\LogWrapper\LogWrapper.csproj" />
