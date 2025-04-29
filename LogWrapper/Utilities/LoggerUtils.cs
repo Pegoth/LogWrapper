@@ -51,6 +51,7 @@ public static class LoggerUtils
         serilogConfig.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning);
         serilogConfig.MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning);
         serilogConfig.MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning);
+        serilogConfig.MinimumLevel.Override("Microsoft.Extensions.Http.DefaultHttpClientFactory", LogEventLevel.Warning);
 
         wrapperConfig.LogLevel ??= (LogLevels) Enum.Parse(typeof(LogLevels), typeof(LogConfiguration).GetProperty(nameof(LogConfiguration.LogLevel))?.GetCustomAttribute<DefaultValueAttribute>()?.Value?.ToString() ?? nameof(LogLevels.Information));
         wrapperConfig.Sinks    ??= (LogSinks) Enum.Parse(typeof(LogSinks), typeof(LogConfiguration).GetProperty(nameof(LogConfiguration.Sinks))?.GetCustomAttribute<DefaultValueAttribute>()?.Value?.ToString() ?? nameof(LogSinks.Console));
