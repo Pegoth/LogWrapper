@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using LogWrapper.Configurations;
 using LogWrapper.Enums;
+using LogWrapper.Filters;
 using LogWrapper.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -81,6 +82,10 @@ public static class LoggerUtils
             {
                 exceptions.Add((file, ex));
             }
+
+        // If duplicated messages are not allowed, add the simple dedupe filter
+        if (wrapperConfig.AllowDuplicatedMessages != true)
+            serilogConfig.Filter.With(new SimpleDedupeFilter());
 
         // Configure global minimum log level
         serilogConfig.MinimumLevel.Is(wrapperConfig.LogLevel.Value.ToSerilogLevel());

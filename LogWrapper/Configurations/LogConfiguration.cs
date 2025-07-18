@@ -24,4 +24,9 @@ public class LogConfiguration
     ///     Directory that will hold the log files. Only used if <see cref="Sinks" /> has <see cref="LogSinks.File" />.
     /// </summary>
     public string? LogFilesPath { get; init; }
+
+    /// <summary>
+    ///     Whether to allow duplicated message output or not.
+    /// </summary>
+    public bool? AllowDuplicatedMessages { get; set; } = false;
 }
